@@ -1,1 +1,2 @@
 asyncssh>=2.13.0
+pyserial>=3.5

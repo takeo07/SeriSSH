@@ -20,6 +20,10 @@ def configure_logging(level: str = "INFO", logfile: Optional[str] = None) -> Non
 	else:
 		handlers.append(logging.StreamHandler())
 	logging.basicConfig(level=lvl, format="%(asctime)s %(levelname)s %(name)s: %(message)s", handlers=handlers)
+	
+	# Also set asyncssh logger to the same level for debugging
+	asyncssh_logger = logging.getLogger("asyncssh")
+	asyncssh_logger.setLevel(lvl)
 
 
 logger = logging.getLogger("seri_ssh")

@@ -26,17 +26,19 @@ def main():
     ap.add_argument('--user', help='Allowed username for password auth')
     ap.add_argument('--password', help='Password for the allowed user')
     ap.add_argument('--serial', help='Serial device path to bridge (e.g. /dev/ttyUSB0). If omitted a PTY pair is created and the slave path is shown in logs')
+    ap.add_argument('--baud', type=int, default=115200, help='Serial baud rate (used when --serial is provided)')
+    ap.add_argument('--log-level', default='INFO', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], help='Logging level (default: INFO)')
 
     args = ap.parse_args()
 
     # configure logging early
     try:
-        configure_logging()
+        configure_logging(level=args.log_level)
     except Exception:
         # fallback: basic logging via print
         pass
 
-    logger.info("seri_ssh starting: port=%s serial=%s", args.port, args.serial)
+    logger.info("seri_ssh starting: port=%s serial=%s baud=%s", args.port, args.serial, args.baud)
 
     # Require an existing host key file; fail fast if missing
     if not pathlib.Path(args.host_key).exists():
@@ -49,7 +51,7 @@ def main():
         sys.exit(1)
 
     async def _run_server():
-        await server.start_server(host='0.0.0.0', port=args.port, host_key=args.host_key, user=args.user, password=args.password, serial_path=args.serial)
+        await server.start_server(host='0.0.0.0', port=args.port, host_key=args.host_key, user=args.user, password=args.password, serial_path=args.serial, baudrate=args.baud)
         # keep running until interrupted
         await asyncio.Future()
 
